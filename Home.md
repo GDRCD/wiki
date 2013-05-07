@@ -1,1 +1,11 @@
-Welcome to the GDRCD wiki!
+Benvenuti sulla Wiki di GDRCD5!
+
+Con il tempo probabilmente questa Wiki crescerà con note e indicazioni varie.
+Per ora limitiamoci a qualche linea guida su cosa facciamo un questo repository e cosa è meglio fare altrove:
+1. Questo repository serve per lo sviluppo della versione base di GDRCD5. Lo sviluppo di patch e di plugin dovrebbe venire fatto altrove. Il consiglio migliore che si possa dare se vuoi sviluppare una patch o un plugin per gdrcd è di fare il Fork di questo repository. In questo modo il tuo repo sarà collegato con il nostro e potrai sincronizzare in automatico le modifiche che apportiamo con il tempo al codice, pur mantenendo separate la versione base e la versione con il plugin/patch. Poi se in un futuro ci fosse la volontà di includere il tuo plugin/patch nella versione base di gdrcd sarebbe comunque molto facile farlo, sfruttando il sistema delle "Pull Request" di github. Perciò **per le patch e i plugin forkate il repo**!
+
+2. Se devi sviluppare una modifica sostanziale al codice di gdrcd5 che dovrà finire nella versione base, allora si possono percorrere due strade più o meno equivalenti:
+  a. Forkare il repo: se non vuoi entrare a far parte stabilmente del team di sviluppo di gdrcd, puoi forkare il nostro repository, sviluppare le tue modifiche e poi inviarci una pull request per importare il tuo codice nella versione base.
+  b. Branching: se fai parte del team stabile di sviluppo di gdrcd, è cosa buona e giusta creare una branch contenente la tua modifica al codice! Per modifiche al codice che sono grosse e occupano più di un solo commit è sempre bene creare una branch separata, così mentre tu sviluppi le tue modifiche non darai fastidio e non sarai infastidito dal lavoro degli altri sviluppatori. Quando il tuo lavoro sarà finito potremo fare il merge della tua branch con la branch principale (attualmente denominata Breaker, invece del classico master)
+
+3. è consigliabile aprire issue relative alla sola versione base del progetto! Per richieste di sviluppo di codice personalizzato che difficilmente finirà nella version base di gdrcd è meglio non aprire issue qui, perchè difficilmente si riceveranno risposte in merito! Per questo tipo di richieste è più consigliabile aprire un thread sul portale gdr-online.com, nella sezione programmazione del forum.
