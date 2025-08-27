@@ -6,7 +6,7 @@ Questa documentazione illustra i tre flussi principali che gestiscono la chat AJ
 
 ## 1. Lettura Messaggi Chat (`chat_read`)
 
-![chat_read](chat_read.png)
+![chat_read](chat/chat_read.png)
 
 ### Descrizione Sommaria
 
@@ -160,7 +160,7 @@ Ogni tipo di messaggio utilizza una funzione `_format` dedicata, che a sua volta
 
 ## 2. Scrittura Messaggi Chat (`chat_write`)
 
-![chat_write](chat_write.png)
+![chat_write](chat/chat_write.png)
 
 ### Descrizione Sommaria
 
@@ -246,7 +246,7 @@ function gdrcd_chat_output($status) {
 
 ## 3. Sistema Abilità / Skill System (`chat_skillsystem`)
 
-![chat_skillsystem](chat_skillsystem.png)
+![chat_skillsystem](chat/chat_skillsystem.png)
 
 ### Descrizione Sommaria
 
