@@ -4,26 +4,26 @@ Questa documentazione illustra i tre flussi principali che gestiscono la chat AJ
 
 ---
 
-## 1. Lettura Messaggi Chat (`chat_read`)
+## 1. Lettura Messaggi Chat (`read`)
 
 ![chat_read](chat/chat_read.png)
 
 ### Descrizione Sommaria
 
 1. La lettura dei messaggi avviene tramite polling dal frontend nel file `/pages/chat/chat_box.php`.
-2. Il browser invia una richiesta GET a `/pages/chat/ajax.php?op=chat_read`.
-3. Questa richiesta viene gestita dal file `/pages/chat/op/chat_read.inc.php` che si occupa di recuperare i nuovi messaggi dal database, formattarli in HTML e restituirli al frontend.
+2. Il browser invia una richiesta GET a `/ajax.php?page=chat&op=read`.
+3. Questa richiesta viene gestita dal file `/pages/chat/op/read.inc.php` che si occupa di recuperare i nuovi messaggi dal database, formattarli in HTML e restituirli al frontend.
 
 ### File Operation
 
-Il flusso di lettura viene avviato in **/pages/chat/op/chat_read.inc.php** tramite le funzioni di seguito:
+Il flusso di lettura viene avviato in **/pages/chat/op/read.inc.php** tramite le funzioni di seguito:
 
 ```php
 // legge le azioni dal database già formattate in html
 $azioni = gdrcd_chat_read_messages($map_id, $chat_last_id);
 
 // stampa le azioni lette
-gdrcd_chat_output($azioni);
+gdrcd_api_output($azioni);
 ```
 
 ### Dettaglio Delle Funzioni PHP Coinvolte
@@ -69,11 +69,11 @@ function gdrcd_chat_message_handler($azione) {
 }
 ```
 
-**gdrcd_chat_output()**
+**gdrcd_api_output()**
 Restituisce la risposta in formato JSON al frontend.
 
 ```php
-function gdrcd_chat_output($status) {
+function gdrcd_api_output($status) {
     ...
     echo json_encode(['code' => $code, 'message' => $message]);
 }
@@ -178,27 +178,27 @@ Ogni tipo di messaggio utilizza una funzione `_format` dedicata, che a sua volta
 
 ---
 
-## 2. Scrittura Messaggi Chat (`chat_write`)
+## 2. Scrittura Messaggi Chat (`write`)
 
 ![chat_write](chat/chat_write.png)
 
 ### Descrizione Sommaria
 
 1. La scrittura dei messaggi avviene quando l'utente invia un testo in chat tramite il form in `/pages/chat/chat_input.php`.
-2. Il payload viene inviato via POST a `/pages/chat/ajax.php?op=chat_write`, gestito da `/pages/chat/op/chat_write.inc.php`.
+2. Il payload viene inviato via POST a `/ajax.php?page=chat&op=write`, gestito da `/pages/chat/op/write.inc.php`.
 3. I dati vengono processati e salvati nel database se validi.
 
 
 ### File Operation
 
-Il flusso di scrittura viene avviato in **/pages/chat/op/chat_write.inc.php** tramite le funzioni di seguito:
+Il flusso di scrittura viene avviato in **/pages/chat/op/write.inc.php** tramite le funzioni di seguito:
 
 ```php
 // tenta di scrivere l'azione sul database
 $chat_insert_status = gdrcd_chat_write_message($message, $tag_o_destinatario, $type);
 
 // ritorna l'esito dell'operazione
-gdrcd_chat_output($chat_insert_status);
+gdrcd_api_output($chat_insert_status);
 ```
 
 ### Funzioni PHP Coinvolte
@@ -230,7 +230,7 @@ function gdrcd_chat_write_message($message, $tag_o_destinatario = '', $type = nu
         // ... altri tipi
 
         default:
-            return gdrcd_chat_status_invalid(...);
+            return gdrcd_chat_api_invalid(...);
     }
 }
 ```
@@ -275,30 +275,30 @@ function gdrcd_chat_db_insert(
 }
 ```
 
-**gdrcd_chat_output()**
+**gdrcd_api_output()**
 Restituisce la risposta (successo o errore) al frontend:
 
 ```php
-function gdrcd_chat_output($status) {
+function gdrcd_api_output($status) {
     // Vedi esempio sopra
 }
 ```
 
 ---
 
-## 3. Sistema Abilità / Skill System (`chat_skillsystem`)
+## 3. Sistema Abilità / Skill System (`skillsystem`)
 
 ![chat_skillsystem](chat/chat_skillsystem.png)
 
 ### Descrizione Sommaria
 
 1. Il flusso del sistema abilità viene attivato quando l'utente invia il form dei tiri in chat.
-2. Il frontend invia una richiesta POST a `/pages/chat/ajax.php?op=chat_skillsystem`, che viene gestita da `/pages/chat/op/chat_skillsystem.inc.php`.
+2. Il frontend invia una richiesta POST a `/ajax.php?page=chat&op=skillsystem`, che viene gestita da `/pages/chat/op/skillsystem.inc.php`.
 3. In base alla selezione dell'utente (`skills`, `stats`, `dice`, `items`), viene invocata la funzione PHP corretta per gestire la richiesta.
 
 ### File Operation
 
-Il flusso di scrittura viene avviato in **/pages/chat/op/chat_skillsystem.inc.php** e gestisce il lancio di una determinata prova/lancio/uso oggetto in base alla selezione utente nel form in chat.
+Il flusso di scrittura viene avviato in **/pages/chat/op/skillsystem.inc.php** e gestisce il lancio di una determinata prova/lancio/uso oggetto in base alla selezione utente nel form in chat.
 
 ```php
 switch ($selezione_tiro) {
@@ -315,11 +315,11 @@ switch ($selezione_tiro) {
         $output = gdrcd_chat_use_item($id_item);
         break;
     default:
-        $output = gdrcd_chat_status_invalid(...);
+        $output = gdrcd_chat_api_invalid(...);
         break;
 }
 
-gdrcd_chat_output($output);
+gdrcd_api_output($output);
 ```
 
 **Nello specifico:**
@@ -335,7 +335,7 @@ Queste funzioni invocano a loro volta `gdrcd_chat_write_message()` per gestire l
 
 ## Note Generali
 
-- Tutti i flussi si basano su AJAX e su risposte JSON standardizzate tramite `gdrcd_chat_output()`.
+- Tutti i flussi si basano su AJAX e su risposte JSON standardizzate tramite `gdrcd_api_output()`.
 - Ogni flusso ha un "Sad Path" che restituisce un messaggio di errore al frontend in caso di dati non validi o permessi insufficienti.
 - La logica di formattazione dei messaggi è centralizzata in `functions.chat_read.inc.php`, mentre la logica di scrittura/insert in `functions.chat_write.inc.php`.
 
@@ -350,9 +350,9 @@ Visualizzazione chat e codice javascript necessario al funzionamento.
 
 **Operations:**
 Responsabili di gestire le richieste in arrivo dal frontend e ritornare un output.
-- `/pages/chat/op/chat_read.inc.php`
-- `/pages/chat/op/chat_skillsystem.inc.php`
-- `/pages/chat/op/chat_write.inc.php`
+- `/pages/chat/op/read.inc.php`
+- `/pages/chat/op/skillsystem.inc.php`
+- `/pages/chat/op/write.inc.php`
 
 **Functions:**
 Funzioni di core che implementano ogni dettaglio di funzionamento della chat.
