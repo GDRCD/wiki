@@ -8,7 +8,7 @@ Questa documentazione illustra i tre flussi principali che gestiscono la chat AJ
 
 ![chat_read](chat/chat_read.png)
 
-### Descrizione Sommaria
+### Descrizione Flusso
 
 1. La lettura dei messaggi avviene tramite polling dal frontend nel file `/pages/chat/chat_box.php`.
 2. Il browser invia una richiesta GET a `/ajax.php?page=chat&op=read`.
@@ -16,7 +16,7 @@ Questa documentazione illustra i tre flussi principali che gestiscono la chat AJ
 
 ### File Operation
 
-Il flusso di lettura viene avviato in **/pages/chat/op/read.inc.php** tramite le funzioni di seguito:
+**/pages/chat/op/read.inc.php** è il file responsabile per la lettura delle azioni in chat, tramite le funzioni chiave mostrate di seguito:
 
 ```php
 // legge le azioni dal database già formattate in html
@@ -28,8 +28,8 @@ gdrcd_api_output($azioni);
 
 ### Dettaglio Delle Funzioni PHP Coinvolte
 
-**gdrcd_chat_read_messages()**
-Recupera le azioni dal database formattate in HTML e le fornisce in un formato pronto per essere stampato all'esterno.
+#### 1. gdrcd_chat_read_messages()
+Recupera le azioni dal database formattate in HTML e le organizza in un array pronto per essere stampato all'esterno.
 
 ```php
 function gdrcd_chat_read_messages($luogo, $last_id = 0) {
@@ -52,7 +52,7 @@ function gdrcd_chat_read_messages($luogo, $last_id = 0) {
 }
 ```
 
-**gdrcd_chat_message_handler()**
+#### 2. gdrcd_chat_message_handler()
 Formatta ogni messaggio in HTML in base alla tipologia.
 
 In breve, sceglie in base alla tipologia di azione (`A`, `S`, `M` etc.) quale funzione chiamare per formattare correttamente l'azione in HTML.
@@ -69,8 +69,8 @@ function gdrcd_chat_message_handler($azione) {
 }
 ```
 
-**gdrcd_api_output()**
-Restituisce la risposta in formato JSON al frontend.
+#### 3. gdrcd_api_output()
+Restituisce la risposta in formato JSON.
 
 ```php
 function gdrcd_api_output($status) {
@@ -81,31 +81,10 @@ function gdrcd_api_output($status) {
 
 #### **Formattazione HTML delle azioni**
 
-La formattazione delle azioni in HTML è demandata alle funzioni con suffisso `_format`.
+La formattazione delle azioni in HTML è demandata alle funzioni con suffisso `_format`. Ogni tipologia di azione ha una specifica funzione `_format` responsabile della sua conversione in HTML.
 
-Ogni tipo di messaggio (azione, sussurro, tiro di dado, ecc.) viene gestito da una specifica funzione di formattazione, chiamata dalla funzione principale `gdrcd_chat_message_handler()`.
 
-**Esempio di flusso di formattazione: Messaggio di tipo "Azione"**
-
-```php
-function gdrcd_chat_message_handler($azione) {
-    // $azione è il record letto dal database
-    switch ($azione['tipo']) {
-
-        // se $azione['tipo'] corrisponde al tipo "Azione" (A)
-        case GDRCD_CHAT_ACTION_TYPE:
-            // usa questa funzione per formattare in html e ritornala
-            return gdrcd_chat_action_format($azione);
-
-        // ... altri tipi
-
-        default:
-            return null;
-    }
-}
-```
-
-**Funzione di formattazione:**
+**Funzione di formattazione per messaggi di tipo Azione (`A`):**
 
 ```php
 function gdrcd_chat_action_format($azione) {
@@ -153,15 +132,14 @@ function gdrcd_chat_message_component($tipo, $azione_html) {
     return <<<HTML
         <div class="chat_row_{$tipo}">
             {$azione_html}
-            <br style="clear:both;" />
         </div>
     HTML;
 }
 ```
 
-**Risultato finale (esempio)**
+**Risultato finale**
 
-Supponendo di avere un'azione di tipo "A" (azione), il risultato sarà un HTML simile a:
+Supponendo di avere un'azione di tipo `A` (azione), il risultato sarà un HTML simile a:
 
 ```html
 <div class="chat_row_A">
@@ -170,7 +148,6 @@ Supponendo di avere un'azione di tipo "A" (azione), il risultato sarà un HTML s
     <span class="chat_icons">...</span>
     <span class="chat_name">Blancks [TAG]</span>
     <span class="chat_msg">si avvicina al tavolo</span>
-    <br style="clear:both;" />
 </div>
 ```
 
@@ -182,7 +159,7 @@ Ogni tipo di messaggio utilizza una funzione `_format` dedicata, che a sua volta
 
 ![chat_write](chat/chat_write.png)
 
-### Descrizione Sommaria
+### Descrizione Flusso
 
 1. La scrittura dei messaggi avviene quando l'utente invia un testo in chat tramite il form in `/pages/chat/chat_input.php`.
 2. Il payload viene inviato via POST a `/ajax.php?page=chat&op=write`, gestito da `/pages/chat/op/write.inc.php`.
@@ -191,7 +168,7 @@ Ogni tipo di messaggio utilizza una funzione `_format` dedicata, che a sua volta
 
 ### File Operation
 
-Il flusso di scrittura viene avviato in **/pages/chat/op/write.inc.php** tramite le funzioni di seguito:
+**/pages/chat/op/write.inc.php** è il file responsabile per la scrittura delle azioni in chat, tramite le funzioni chiave mostrate di seguito:
 
 ```php
 // tenta di scrivere l'azione sul database
@@ -203,7 +180,7 @@ gdrcd_api_output($chat_insert_status);
 
 ### Funzioni PHP Coinvolte
 
-**gdrcd_chat_write_message()**
+#### 1. gdrcd_chat_write_message()
 Determina la tipologia del messaggio e lo salva.
 In modo analogo al flusso di lettura, ogni tipologia di azione usa una funzione dedicata per essere scritta sul database, queste funzioni sono riconoscibili dal suffisso `_save`.
 
@@ -235,7 +212,7 @@ function gdrcd_chat_write_message($message, $tag_o_destinatario = '', $type = nu
 }
 ```
 
-**gdrcd_chat_db_insert_for_login()**
+#### 2. gdrcd_chat_db_insert_for_login()
 Utilizza internamente `gdrcd_chat_db_insert()` per salvare il messaggio nella tabella `chat` del database associata al personaggio connesso.
 
 
@@ -275,7 +252,7 @@ function gdrcd_chat_db_insert(
 }
 ```
 
-**gdrcd_api_output()**
+#### 3. gdrcd_api_output()
 Restituisce la risposta (successo o errore) al frontend:
 
 ```php
@@ -290,7 +267,7 @@ function gdrcd_api_output($status) {
 
 ![chat_skillsystem](chat/chat_skillsystem.png)
 
-### Descrizione Sommaria
+### Descrizione Flusso
 
 1. Il flusso del sistema abilità viene attivato quando l'utente invia il form dei tiri in chat.
 2. Il frontend invia una richiesta POST a `/ajax.php?page=chat&op=skillsystem`, che viene gestita da `/pages/chat/op/skillsystem.inc.php`.
@@ -298,7 +275,7 @@ function gdrcd_api_output($status) {
 
 ### File Operation
 
-Il flusso di scrittura viene avviato in **/pages/chat/op/skillsystem.inc.php** e gestisce il lancio di una determinata prova/lancio/uso oggetto in base alla selezione utente nel form in chat.
+**/pages/chat/op/write.inc.php** è il file responsabile per il lancio di una determinata prova/lancio/uso oggetto in base alla selezione utente nel form in chat, tramite le funzioni chiave mostrate di seguito:
 
 ```php
 switch ($selezione_tiro) {
