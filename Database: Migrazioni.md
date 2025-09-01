@@ -7,12 +7,15 @@ Le database migrations sono uno strumento fondamentale per la gestione evolutiva
 Per applicare le migrations, è sufficiente navigare all'endpoint `/installer.php` dell'applicazione e cliccare sul pulsante "Installa". GDRCD eseguirà tutte le migrations non ancora applicate e mostrerà un messaggio di successo oppure di errore in caso di fallimento dell'operazione.
 
 **Pagina Di Installazione**
+
 ![install](migrations/install.png)
 
 **Migration Riuscita**
+
 ![success](migrations/success.png)
 
 **Migration Fallita**
+
 ![error](migrations/error.png)
 
 
