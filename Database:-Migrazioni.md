@@ -98,6 +98,8 @@ La descrizione deve seguire il case dell'esempio e, quando possibile, uno dei se
 	*Quando si aggiunge, elimina o modifica una colonna*
 - `[Add/Drop/Update]_[nomeindice]_Index_In_[nometabella]_Table`
 	*Quando si aggiunge, elimina o modifica un indice*
+- `[Insert/Delete/Update]_[nomedato]_In_[nometabella]_Table`
+	*Quando si aggiunge, elimina o modifica uno o più records in una stessa tabella*
 
 **Esempi:**
 
@@ -109,6 +111,8 @@ La descrizione deve seguire il case dell'esempio e, quando possibile, uno dei se
 - `Add_Nome_Index_In_Personaggio_Table`
 - `Drop_DataIscrizione_Index_In_Utente_Table`
 - `Update_Status_Index_In_Personaggio_Table`
+- `Insert_ConfigurazioniForum_In_Configurazioni_Table`
+- `Delete_ConfigurazioniPersonaggio_In_Configurazioni_Table`
 
 **Nota Bene:**
 Quando si scrive una migration per creare una tabella, non è necessario separare la creazione degli indici in una distinta migration. Le linee guida su colonne e indici si applicano quando è necessario aggiornarli in una migration successiva alla creazione della tabella.
