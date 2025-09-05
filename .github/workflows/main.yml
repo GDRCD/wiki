@@ -1,0 +1,33 @@
+name: Sync Wiki
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  sync-wiki:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout docs repo
+      uses: actions/checkout@v4
+      
+    - name: Clone target wiki
+      run: |
+        git clone https://github.com/GDRCD/GDRCD.wiki.git wiki-repo
+        
+    - name: Copy content to wiki
+      run: |
+        # Rimuovi contenuto esistente (escluso .git)
+        find wiki-repo -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+        
+        # Copia nuovo contenuto
+        cp -r docs/* wiki-repo/
+        
+    - name: Commit and push to wiki
+      run: |
+        cd wiki-repo
+        git config user.name "Documentation Bot"
+        git config user.email "bot@gdrcd.org"
+        git add .
+        git commit -m "Auto-update from docs repo: ${{ github.sha }}" || exit 0
+        git push https://x-access-token:${{ secrets.WIKI_TOKEN }}@github.com/GDRCD/GDRCD.wiki.git
