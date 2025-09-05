@@ -2,32 +2,38 @@ name: Sync Wiki
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   sync-wiki:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout docs repo
-      uses: actions/checkout@v4
-      
-    - name: Clone target wiki
-      run: |
-        git clone https://github.com/GDRCD/GDRCD.wiki.git wiki-repo
-        
-    - name: Copy content to wiki
-      run: |
-        # Rimuovi contenuto esistente (escluso .git)
-        find wiki-repo -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
-        
-        # Copia nuovo contenuto
-        cp -r docs/* wiki-repo/
-        
-    - name: Commit and push to wiki
-      run: |
-        cd wiki-repo
-        git config user.name "Documentation Bot"
-        git config user.email "bot@gdrcd.org"
-        git add .
-        git commit -m "Auto-update from docs repo: ${{ github.sha }}" || exit 0
-        git push https://x-access-token:${{ secrets.WIKI_TOKEN }}@github.com/GDRCD/GDRCD.wiki.git
+      - name: Checkout docs repo
+        uses: actions/checkout@v4
+
+      - name: Clone target wiki
+        run: |
+          git clone https://github.com/${{ github.repository_owner }}/GDRCD.wiki.git wiki-repo
+
+      - name: Copy content to wiki
+        run: |
+          # Rimuovi contenuto esistente (escluso .git)
+          find wiki-repo -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+
+          # Copia nuovo contenuto (assumendo che sia in una cartella 'docs')
+          cp -r docs/* wiki-repo/ 2>/dev/null || echo "No docs folder found"
+
+      - name: Commit and push to wiki
+        env:
+          WIKI_TOKEN: ${{ secrets.WIKI_TOKEN }}
+        run: |
+          cd wiki-repo
+          git config user.name "Documentation Bot"
+          git config user.email "action@github.com"
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Auto-update from docs repo: ${{ github.sha }}"
+          git push https://x-access-token:${WIKI_TOKEN}@github.com/${{ github.repository_owner }}/GDRCD.wiki.git
